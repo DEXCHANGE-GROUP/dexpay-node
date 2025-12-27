@@ -1,0 +1,50 @@
+{
+  "name": "@dexchange/pay",
+  "version": "1.0.0",
+  "description": "SDK officiel pour l'API DEXPAY - Paiements Mobile Money pour l'Afrique de l'Ouest",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "lint": "eslint src/",
+    "test": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "dexpay",
+    "dexchange",
+    "payment",
+    "mobile-money",
+    "wave",
+    "orange-money",
+    "mtn",
+    "senegal",
+    "africa",
+    "checkout",
+    "subscription"
+  ],
+  "author": "DEXCHANGE GROUP <dev@dexchange.sn>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DEXCHANGE-GROUP/dexpay-node"
+  },
+  "homepage": "https://docs.dexpay.africa",
+  "bugs": {
+    "url": "https://github.com/DEXCHANGE-GROUP/dexpay-node/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^2.0.0"
+  }
+}
