@@ -34,22 +34,44 @@ describe('DexPay SDK', () => {
       ).toThrow('DexPay: apiSecret is required');
     });
 
-    it('should use sandbox URL when sandbox is true', () => {
+    it('should use sandbox URL when sandbox is true', async () => {
       const sandboxClient = new DexPay({
         apiKey: 'pk_test_123',
         apiSecret: 'sk_test_123',
         sandbox: true,
       });
       expect(sandboxClient).toBeDefined();
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ id: 'test' }),
+      });
+
+      await sandboxClient.checkoutSessions.retrieve('test');
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('api-sandbox.dexpay.africa'),
+        expect.anything(),
+      );
     });
 
-    it('should use production URL when sandbox is false', () => {
+    it('should use production URL when sandbox is false', async () => {
       const prodClient = new DexPay({
         apiKey: 'pk_live_123',
         apiSecret: 'sk_live_123',
         sandbox: false,
       });
       expect(prodClient).toBeDefined();
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ id: 'test' }),
+      });
+
+      await prodClient.checkoutSessions.retrieve('test');
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('api.dexpay.africa'),
+        expect.anything(),
+      );
     });
   });
 

@@ -1,21 +1,24 @@
-# @dexchange/pay
+# @dexchangepay/node
 
 SDK officiel Node.js / TypeScript pour l'API DEXPAY - Paiements Mobile Money pour l'Afrique de l'Ouest.
+
+[![npm version](https://badge.fury.io/js/@dexchangepay%2Fnode.svg)](https://www.npmjs.com/package/@dexchangepay/node)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Installation
 
 ```bash
-npm install @dexchange/pay
+npm install @dexchangepay/node
 # ou
-yarn add @dexchange/pay
+yarn add @dexchangepay/node
 # ou
-pnpm add @dexchange/pay
+pnpm add @dexchangepay/node
 ```
 
 ## Démarrage rapide
 
 ```typescript
-import DexPay from '@dexchange/pay';
+import DexPay from '@dexchangepay/node';
 
 const dexpay = new DexPay({
   apiKey: 'pk_test_xxx', // Votre clé publique
@@ -34,7 +37,7 @@ const session = await dexpay.checkoutSessions.create({
 });
 
 // Rediriger le client vers la page de paiement
-console.log(session.data.payment_url);
+console.log(session.payment_url);
 ```
 
 ## Checkout Sessions
@@ -55,6 +58,7 @@ const session = await dexpay.checkoutSessions.create({
     plan: 'premium',
   },
   expires_at: '2025-12-31T23:59:59Z', // Optionnel
+  client_support_fee: true, // Optionnel - Si true, les frais sont à la charge du client
 });
 ```
 
@@ -95,7 +99,53 @@ const attempt = await dexpay.checkoutSessions.createPaymentAttempt(
 );
 
 // Rediriger vers la page de paiement de l'opérateur
-console.log(attempt.data.payment_url);
+console.log(attempt.payment_url);
+```
+
+## Payouts (Retraits)
+
+### Créer un payout
+
+```typescript
+const payout = await dexpay.payouts.create({
+  amount: 10000,
+  currency: 'XOF',
+  destination_phone: '+221771234567',
+  destination_details: {
+    operator: 'wave',
+    countryISO: 'SN',
+    recipient_name: 'Jean Dupont',
+  },
+  metadata: {
+    invoice_id: 'INV_123',
+  },
+});
+
+console.log(payout.reference); // PO_20251228_XXXXXX
+console.log(payout.status); // PENDING, PROCESSING, COMPLETED, FAILED
+```
+
+### Récupérer un payout
+
+```typescript
+const payout = await dexpay.payouts.retrieve('payout_id');
+```
+
+### Lister les payouts
+
+```typescript
+const payouts = await dexpay.payouts.list({
+  page: 1,
+  limit: 10,
+  status: 'COMPLETED',
+});
+```
+
+### Annuler un payout
+
+```typescript
+// Uniquement possible si le statut est PENDING
+const cancelled = await dexpay.payouts.cancel('payout_id', 'Demande client');
 ```
 
 ## Products
@@ -191,53 +241,10 @@ const subscription = await dexpay.subscriptions.create({
 await dexpay.subscriptions.cancel('sub_123');
 ```
 
-## Payouts (Retraits)
-
-### Créer un payout
-
-```typescript
-const payout = await dexpay.payouts.create({
-  amount: 10000,
-  currency: 'XOF',
-  destination_phone: '+221771234567',
-  destination_details: {
-    operator: 'wave',
-    countryISO: 'SN',
-    recipient_name: 'Jean Dupont',
-  },
-  metadata: {
-    invoice_id: 'INV_123',
-  },
-});
-```
-
-### Lister les payouts
-
-```typescript
-const payouts = await dexpay.payouts.list({
-  page: 1,
-  limit: 10,
-  status: 'COMPLETED',
-});
-```
-
-### Récupérer un payout
-
-```typescript
-const payout = await dexpay.payouts.retrieve('payout_123');
-```
-
-### Annuler un payout
-
-```typescript
-// Uniquement possible si le statut est PENDING
-const cancelled = await dexpay.payouts.cancel('payout_123', 'Demande client');
-```
-
 ## Gestion des erreurs
 
 ```typescript
-import DexPay, { DexPayError } from '@dexchange/pay';
+import DexPay, { DexPayError } from '@dexchangepay/node';
 
 try {
   const session = await dexpay.checkoutSessions.create({...});
@@ -266,6 +273,12 @@ app.post('/webhook', express.json(), (req, res) => {
     case 'checkout.failed':
       console.log('Paiement échoué:', event.data);
       break;
+    case 'payout.completed':
+      console.log('Payout réussi:', event.data);
+      break;
+    case 'payout.failed':
+      console.log('Payout échoué:', event.data);
+      break;
     case 'subscription.created':
       console.log('Abonnement créé:', event.data);
       break;
@@ -281,13 +294,34 @@ app.post('/webhook', express.json(), (req, res) => {
 ## Configuration avancée
 
 ```typescript
+// Mode Production (défaut)
 const dexpay = new DexPay({
   apiKey: 'pk_live_xxx',
   apiSecret: 'sk_live_xxx',
-  baseUrl: 'https://api-dpay.dexchange.sn/api/v1', // Optionnel
+});
+
+// Mode Sandbox (test)
+const dexpayTest = new DexPay({
+  apiKey: 'pk_test_xxx',
+  apiSecret: 'sk_test_xxx',
+  sandbox: true, // Utilise https://api-sandbox.dexpay.africa
+});
+
+// Configuration personnalisée
+const dexpayCustom = new DexPay({
+  apiKey: 'pk_live_xxx',
+  apiSecret: 'sk_live_xxx',
+  baseUrl: 'https://api.dexpay.africa/api/v1', // Override URL
   timeout: 60000, // 60 secondes
 });
 ```
+
+### URLs de l'API
+
+| Environnement | URL                                    |
+| ------------- | -------------------------------------- |
+| Production    | https://api.dexpay.africa/api/v1       |
+| Sandbox       | https://api-sandbox.dexpay.africa/api/v1 |
 
 ## Devises supportées
 

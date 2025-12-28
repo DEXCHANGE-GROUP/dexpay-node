@@ -7,7 +7,9 @@ export interface DexPayConfig {
   apiKey: string;
   /** Clé API secrète (sk_test_xxx ou sk_live_xxx) */
   apiSecret: string;
-  /** URL de base de l'API (optionnel) */
+  /** Mode sandbox (défaut: false) - utilise https://api-sandbox.dexpay.africa */
+  sandbox?: boolean;
+  /** URL de base de l'API (optionnel, override sandbox) */
   baseUrl?: string;
   /** Timeout en ms (défaut: 30000) */
   timeout?: number;

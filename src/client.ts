@@ -4,7 +4,8 @@
 
 import { DexPayConfig, DexPayError, ApiResponse } from './types';
 
-const DEFAULT_BASE_URL = 'https://api-dpay.dexchange.sn/api/v1';
+const PRODUCTION_BASE_URL = 'https://api.dexpay.africa/api/v1';
+const SANDBOX_BASE_URL = 'https://api-sandbox.dexpay.africa/api/v1';
 const DEFAULT_TIMEOUT = 30000;
 
 export class HttpClient {
@@ -14,7 +15,12 @@ export class HttpClient {
   private timeout: number;
 
   constructor(config: DexPayConfig) {
-    this.baseUrl = config.baseUrl || DEFAULT_BASE_URL;
+    // Priority: custom baseUrl > sandbox URL > production URL
+    if (config.baseUrl) {
+      this.baseUrl = config.baseUrl;
+    } else {
+      this.baseUrl = config.sandbox ? SANDBOX_BASE_URL : PRODUCTION_BASE_URL;
+    }
     this.apiKey = config.apiKey;
     this.apiSecret = config.apiSecret;
     this.timeout = config.timeout || DEFAULT_TIMEOUT;
