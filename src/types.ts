@@ -76,6 +76,8 @@ export interface CreateCheckoutSessionParams {
   metadata?: Record<string, any>;
   /** Date d'expiration */
   expires_at?: string;
+  /** Client support fee */
+  client_support_fee?: boolean | null;
 }
 
 export interface CheckoutSession {
@@ -91,6 +93,7 @@ export interface CheckoutSession {
   isSandbox: boolean;
   payment_attempt?: PaymentAttempt;
   sandbox_payment_url?: string;
+  client_support_fee?: boolean | null;
 }
 
 export interface PaymentAttempt {

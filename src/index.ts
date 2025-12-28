@@ -15,7 +15,7 @@ import { DexPayConfig } from './types';
  *
  * @example
  * ```typescript
- * import DexPay from '@dexchange/pay';
+ * import DexPay from '@dexchangepay/node';
  *
  * const dexpay = new DexPay({
  *   apiKey: 'pk_test_xxx',

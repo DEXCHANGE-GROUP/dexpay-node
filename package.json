@@ -1,5 +1,5 @@
 {
-  "name": "@dexchange/pay",
+  "name": "@dexchangepay/node",
   "version": "1.0.0",
   "description": "SDK officiel pour l'API DEXPAY - Paiements Mobile Money pour l'Afrique de l'Ouest",
   "main": "dist/index.js",
